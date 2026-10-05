@@ -1,0 +1,1313 @@
+<!doctype html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bir Milyon Kalp</title>
+<meta name="description" content="1.000.000 kalp, her biri 100 ₺. Marmara Üniversitesi ile birlikte geliştirilecek yerli lösemi ilacı için bağış kampanyası.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Yerleşim: üstte mesaj + kalp sayacı (iki sütun), altında blok haritası ve 1.000 kalplik blok görünümü; dar ekranda tek sütun. */
+:root{
+  --paper:#F4F5F9;
+  --surface:#FFFFFF;
+  --ink:#141A2C;
+  --muted:#596079;
+  --line:#DADDE8;
+  --red:#C8102E;
+  --red-text:#B00D28;
+  --red-soft:#FBE4E8;
+  --on-red:#FFFFFF;
+  --heart-empty:#D3D8E4;
+  --display:"Archivo","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C101B;--surface:#141A29;--ink:#EBEDF4;--muted:#9AA2BA;--line:#262D42;
+    --red:#D42742;--red-text:#FF7A8C;--red-soft:#3A1622;--on-red:#FFFFFF;--heart-empty:#2A3249;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C101B;--surface:#141A29;--ink:#EBEDF4;--muted:#9AA2BA;--line:#262D42;
+  --red:#D42742;--red-text:#FF7A8C;--red-soft:#3A1622;--on-red:#FFFFFF;--heart-empty:#2A3249;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1rem/1.6 var(--body)}
+img,svg,canvas{max-width:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red-text);outline-offset:2px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+[dir="rtl"] .label,[dir="rtl"] .eyebrow{letter-spacing:0}
+
+/* Önizleme şeridi: ödeme altyapısı bağlandıktan sonra bu şeridi ve pencere içindeki notu kaldırın. */
+.strip{background:var(--ink);color:var(--paper);font-size:.8125rem;line-height:1.4;text-align:center;padding:.5rem 16px;padding-top:calc(.5rem + env(safe-area-inset-top,0px))}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-stretch:112%;font-size:1.15rem;letter-spacing:-.005em}
+.brand svg{width:26px;height:26px;fill:var(--red);flex:none}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.4rem .6rem;font-size:.9rem;min-height:40px;cursor:pointer}
+
+/* Açılış */
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(20px,4vw,48px) clamp(40px,6vw,72px)}
+.hero-text{min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red-text)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);flex:none}
+h1{font-weight:800;font-stretch:110%;font-size:clamp(2.05rem,4.4vw,3.45rem);line-height:1.06;letter-spacing:-.015em;margin-block:.45em .5em;hyphens:auto}
+[dir="rtl"] h1{line-height:1.4;letter-spacing:0;font-weight:700}
+.lead{font-size:1.08rem;color:var(--muted);max-width:58ch}
+.prices{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:22px}
+.price-chips{display:flex;flex-wrap:wrap;gap:8px}
+.price{font-family:var(--mono);font-size:.9rem;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.25rem .8rem;cursor:pointer;min-height:36px;font-variant-numeric:tabular-nums}
+.price:hover{border-color:var(--ink)}
+.price[aria-pressed="true"]{background:var(--red-soft);border-color:var(--red);color:var(--red-text)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 1.3rem;border-radius:10px;font-weight:600;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:filter .15s,border-color .15s}
+.btn.primary{background:var(--red);color:var(--on-red)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.primary:disabled{opacity:.65;cursor:progress}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn svg{width:18px;height:18px;fill:currentColor;flex:none}
+.partner{margin-top:22px;font-size:.92rem;font-weight:500;color:var(--ink)}
+
+.tally{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(20px,3vw,30px);display:grid;gap:18px;min-width:0}
+.big{font-family:var(--display);font-weight:800;font-stretch:112%;font-size:clamp(2.6rem,5.4vw,4.2rem);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--red-text);margin-top:8px}
+.of{font-family:var(--mono);color:var(--muted);font-size:.95rem;margin-top:8px}
+.bar{height:10px;border-radius:99px;background:var(--heart-empty);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--red);border-radius:inherit;transition:width .6s ease}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:6px}
+.pct{font-size:.85rem;color:var(--muted)}
+.stats{margin:0;border-top:1px solid var(--line)}
+.stats div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-block:10px;border-bottom:1px solid var(--line)}
+.stats dt{font-size:.9rem;color:var(--muted)}
+.stats dd{margin:0;font-family:var(--display);font-weight:700;font-stretch:105%;font-variant-numeric:tabular-nums;font-size:1.1rem;text-align:end}
+
+/* Bölümler */
+.sec{padding-block:clamp(40px,6vw,72px);border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:10px;margin-bottom:26px;max-width:68ch}
+.sec-head p{color:var(--muted)}
+h2{font-weight:800;font-stretch:110%;font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.1;letter-spacing:-.01em}
+[dir="rtl"] h2{line-height:1.45;letter-spacing:0;font-weight:700}
+
+.wall-grid{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.block-panel{grid-column:2;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.map-panel{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.block-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.block-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;min-width:0}
+.block-title h3{font-size:1.25rem;font-weight:800;font-stretch:108%}
+.block-range{font-size:.85rem;color:var(--muted)}
+.block-tools{display:flex;align-items:center;gap:8px}
+.fillcount{font-size:.85rem;color:var(--muted);margin-inline-end:4px}
+.icon-btn{width:40px;height:40px;display:inline-grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;padding:0}
+.icon-btn:hover:not(:disabled){border-color:var(--ink)}
+.icon-btn:disabled{opacity:.4;cursor:default}
+.icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+[dir="rtl"] .icon-btn svg{transform:scaleX(-1)}
+.wall-box{position:relative}
+.wall-box canvas{display:block;width:100%;touch-action:manipulation}
+.tip{position:absolute;z-index:2;pointer-events:none;background:var(--ink);color:var(--paper);font-size:.8rem;line-height:1.35;padding:.4rem .65rem;border-radius:8px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 6px 20px rgb(0 0 0 / .18)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.85rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{width:15px;height:15px}
+.lg-empty{fill:var(--heart-empty)}
+.lg-taken{fill:var(--red)}
+.lg-mine{fill:var(--red);stroke:var(--ink);stroke-width:2.2}
+.map-hint{font-size:.85rem;color:var(--muted)}
+.map-box canvas{display:block;width:100%;cursor:pointer;touch-action:manipulation}
+.map-cap{font-size:.8rem;color:var(--muted);min-height:1.3em}
+.find{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+.find label{font-size:.875rem;font-weight:600}
+.find-row{display:flex;gap:8px}
+.find-row input{flex:1 1 auto;width:0;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.45rem .7rem;min-height:42px;font-family:var(--mono)}
+.find-row .btn{min-height:42px;padding:0 1rem}
+.err{font-size:.82rem;color:var(--red-text)}
+.link-btn{background:none;border:0;padding:0;color:var(--red-text);font-weight:600;cursor:pointer;text-align:start;text-decoration:underline;text-underline-offset:3px;justify-self:start}
+
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,36px);counter-reset:s}
+.steps li{counter-increment:s;border-top:2px solid var(--ink);padding-top:16px;display:grid;gap:8px;align-content:start}
+.steps li::before{content:counter(s);font-family:var(--display);font-weight:800;font-stretch:112%;font-size:2.4rem;line-height:1;color:var(--red-text)}
+.steps h3{font-size:1.15rem;font-weight:700;font-stretch:105%}
+.steps p{color:var(--muted)}
+
+.fund{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,64px);align-items:start}
+.fund .sec-head{margin:0}
+.stages{list-style:none;margin:0;padding:0;display:grid}
+.stages li{position:relative;padding-inline-start:34px;padding-bottom:24px}
+.stages li::before{content:"";position:absolute;inset-inline-start:7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--red)}
+.stages li::after{content:"";position:absolute;inset-inline-start:12px;top:22px;bottom:2px;width:2px;background:var(--line)}
+.stages li:last-child{padding-bottom:0}
+.stages li:last-child::after{display:none}
+.stages h3{font-size:1.05rem;font-weight:700;font-stretch:105%}
+.stages p{color:var(--muted);margin-top:4px}
+
+footer{border-top:1px solid var(--line);padding-block:28px calc(28px + env(safe-area-inset-bottom,0px))}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 28px;font-size:.875rem;color:var(--muted)}
+.foot .brand{font-size:1rem;color:var(--ink)}
+.foot .brand svg{width:20px;height:20px}
+
+/* Bağış penceresi */
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--surface);color:var(--ink);width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
+dialog::backdrop{background:rgb(8 10 18 / .55)}
+.dlg{display:grid;gap:16px;padding:22px}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dlg-head h3{font-size:1.3rem;font-weight:800;font-stretch:108%}
+.x{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;padding:0}
+.x svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.field{display:grid;gap:8px}
+.field-lbl{font-size:.875rem;font-weight:600}
+.sel-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:.88rem}
+.sel-list span{background:var(--red-soft);color:var(--red-text);border-radius:6px;padding:.1rem .45rem}
+.sel-list em{font-style:normal;color:var(--muted);font-family:var(--body);font-size:.85rem}
+.qty-wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.qty-row{display:flex;gap:6px;align-items:center}
+.qty-row input{width:84px;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:8px;min-height:40px;font-family:var(--mono)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:36px;min-width:40px;padding:0 .75rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--mono);font-size:.85rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dlg select{width:100%}
+.dlg input[type="text"]{background:var(--paper);border:1px solid var(--line);border-radius:8px;min-height:42px;padding:.45rem .7rem;width:100%}
+.dlg input[type="text"]:disabled{opacity:.5}
+.check{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--red);margin:0}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:14px;border-top:1px solid var(--line)}
+.total-row strong{display:block;font-family:var(--display);font-weight:800;font-stretch:110%;font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1;text-align:end}
+.per{font-size:.8rem;color:var(--muted);text-align:end}
+.demo-note{font-size:.8rem;color:var(--muted);background:var(--paper);border-radius:8px;padding:.6rem .75rem}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1 1 140px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--paper);padding:.75rem 1.1rem;border-radius:12px;font-weight:500;width:max-content;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgb(0 0 0 / .25)}
+.toast.show{animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+@media (max-width:880px){
+  .hero,.fund{grid-template-columns:1fr}
+  .wall-grid{grid-template-columns:1fr}
+  .block-panel,.map-panel{grid-column:auto;grid-row:auto}
+}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="strip" data-i18n="strip"></div>
+
+<header class="wrap top">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    <span data-i18n="brand"></span>
+  </div>
+  <div class="controls">
+    <label><span class="sr" data-i18n="lang_lbl"></span><select id="langSel"></select></label>
+    <label><span class="sr" data-i18n="m_cur"></span><select id="curSel"></select></label>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" aria-labelledby="h1">
+    <div class="hero-text">
+      <span class="eyebrow" data-i18n="eyebrow"></span>
+      <h1 id="h1" data-i18n="h1"></h1>
+      <p class="lead" id="lead"></p>
+      <div class="prices">
+        <span class="label" data-i18n="price_lbl"></span>
+        <span class="price-chips" id="priceChips"></span>
+      </div>
+      <div class="cta">
+        <button class="btn primary" id="ctaBuy" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span data-i18n="cta_buy"></span>
+        </button>
+        <a class="btn ghost" href="#wall" data-i18n="cta_wall"></a>
+      </div>
+      <p class="partner" data-i18n="partner"></p>
+    </div>
+
+    <aside class="tally">
+      <div>
+        <div class="label" data-i18n="st_red"></div>
+        <div class="big" id="bigNum">0</div>
+        <div class="of" id="ofTotal"></div>
+      </div>
+      <div>
+        <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="0"><i id="barFill"></i></div>
+        <div class="ticks" id="ticks"></div>
+      </div>
+      <p class="pct" id="pct"></p>
+      <dl class="stats">
+        <div><dt data-i18n="st_raised"></dt><dd id="raised"></dd></div>
+        <div><dt data-i18n="st_goal"></dt><dd id="goal"></dd></div>
+        <div><dt data-i18n="st_left"></dt><dd id="left"></dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="wrap sec" id="wall" aria-labelledby="wallH">
+    <div class="sec-head">
+      <h2 id="wallH" data-i18n="wall_h"></h2>
+      <p data-i18n="wall_p"></p>
+    </div>
+    <div class="wall-grid">
+      <div class="panel block-panel" id="blockPanel">
+        <div class="block-head">
+          <div class="block-title">
+            <h3 id="blkTitle"></h3>
+            <span class="block-range mono" id="blkRange"></span>
+          </div>
+          <div class="block-tools">
+            <span class="fillcount mono" id="blkFill"></span>
+            <button class="icon-btn" id="prevBtn" type="button" data-i18n-aria="prev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="icon-btn" id="nextBtn" type="button" data-i18n-aria="next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="wall-box" id="wallBox" dir="ltr">
+          <canvas id="wallCv" role="img"></canvas>
+          <div class="tip" id="tip" hidden></div>
+        </div>
+        <div class="legend">
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path class="lg-empty" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><b data-i18n="lg_empty" style="font-weight:400"></b></span>
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path class="lg-taken" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><b data-i18n="lg_taken" style="font-weight:400"></b></span>
+          <span><svg viewBox="0 0 24 24" aria-hidden="true"><path class="lg-mine" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><b data-i18n="lg_mine" style="font-weight:400"></b></span>
+        </div>
+      </div>
+
+      <div class="panel map-panel">
+        <div class="label" data-i18n="map_lbl"></div>
+        <p class="map-hint" data-i18n="map_hint"></p>
+        <div class="map-box" id="mapBox" dir="ltr"><canvas id="mapCv" aria-hidden="true"></canvas></div>
+        <p class="map-cap mono" id="mapCap"></p>
+        <form class="find" id="findForm" novalidate>
+          <label for="findIn" data-i18n="find_lbl"></label>
+          <div class="find-row">
+            <input id="findIn" type="text" inputmode="numeric" autocomplete="off" data-i18n-ph="find_ph">
+            <button class="btn ghost" type="submit" data-i18n="find_go"></button>
+          </div>
+          <p class="err" id="findErr" role="alert" hidden></p>
+        </form>
+        <button class="link-btn" id="jumpBtn" type="button" data-i18n="jump"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec" aria-labelledby="howH">
+    <div class="sec-head"><h2 id="howH" data-i18n="how_h"></h2></div>
+    <ol class="steps">
+      <li><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></li>
+      <li><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></li>
+      <li><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></li>
+    </ol>
+  </section>
+
+  <section class="wrap sec fund" aria-labelledby="fundH">
+    <div class="sec-head">
+      <h2 id="fundH" data-i18n="fund_h"></h2>
+      <p data-i18n="fund_p"></p>
+    </div>
+    <ol class="stages">
+      <li><h3 data-i18n="f1_t"></h3><p data-i18n="f1_p"></p></li>
+      <li><h3 data-i18n="f2_t"></h3><p data-i18n="f2_p"></p></li>
+      <li><h3 data-i18n="f3_t"></h3><p data-i18n="f3_p"></p></li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <span data-i18n="brand"></span>
+    </div>
+    <span data-i18n="partner"></span>
+    <span data-i18n="rate_note"></span>
+  </div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form class="dlg" id="buyForm" novalidate>
+    <div class="dlg-head">
+      <h3 id="dlgTitle" data-i18n="m_title"></h3>
+      <button class="x" type="button" id="dlgX" data-i18n-aria="m_close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div class="field">
+      <span class="field-lbl" data-i18n="m_sel"></span>
+      <div class="sel-list" id="selList"></div>
+    </div>
+
+    <div class="field">
+      <label class="field-lbl" for="qty" data-i18n="m_qty"></label>
+      <div class="qty-wrap">
+        <div class="qty-row">
+          <button class="icon-btn" type="button" data-step="-1" aria-label="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+          <input id="qty" type="number" min="1" max="1000" value="1" inputmode="numeric">
+          <button class="icon-btn" type="button" data-step="1" aria-label="+1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-lbl" for="curSel2" data-i18n="m_cur"></label>
+      <select id="curSel2"></select>
+    </div>
+
+    <div class="field">
+      <label class="field-lbl" for="donor" data-i18n="m_name"></label>
+      <input id="donor" type="text" maxlength="40" autocomplete="name" data-i18n-ph="m_name_ph">
+      <label class="check"><input type="checkbox" id="anonChk"><span data-i18n="m_anon"></span></label>
+    </div>
+
+    <div class="total-row">
+      <span class="field-lbl" data-i18n="m_total"></span>
+      <div><strong id="totalAmt"></strong><div class="per" id="perAmt"></div></div>
+    </div>
+
+    <p class="demo-note" data-i18n="m_demo"></p>
+    <p class="err" id="dlgErr" role="alert" hidden></p>
+
+    <div class="actions">
+      <button class="btn ghost" type="button" id="dlgCancel" data-i18n="m_cancel"></button>
+      <button class="btn primary" type="submit" id="payBtn"></button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ───────── Ayarlar ───────── */
+const TOTAL = 1000000;
+const PER_BLOCK = 1000;
+const BLOCKS = TOTAL / PER_BLOCK;
+
+// Kalp fiyatı 100 ₺. Döviz karşılıkları 2 Ekim 2026 kuruyla
+// (1 USD ≈ 49,14 ₺ · 1 EUR ≈ 55,35 ₺ · 1 GBP ≈ 65,0 ₺) yaklaşık 100 ₺ olacak şekilde yuvarlandı.
+const PRICES = { TRY: 100, USD: 2, EUR: 1.8, GBP: 1.5 };
+const CURRENCIES = ['TRY', 'USD', 'EUR', 'GBP'];
+const CUR_LABEL = { TRY: '₺ TRY', USD: '$ USD', EUR: '€ EUR', GBP: '£ GBP' };
+const LOCALES = { tr: 'tr-TR', en: 'en-US', de: 'de-DE', fr: 'fr-FR', ar: 'ar-u-nu-latn' };
+const LANG_NAMES = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français', ar: 'العربية' };
+const LANG_CUR = { tr: 'TRY', en: 'USD', de: 'EUR', fr: 'EUR', ar: 'USD' };
+
+/* ───────── Metinler ───────── */
+const T = {
+tr: {
+  strip: "Önizleme sürümü: ödeme altyapısı bağlanana kadar gerçek ödeme alınmaz.",
+  brand: "Bir Milyon Kalp",
+  eyebrow: "Lösemiye karşı yerli ilaç",
+  h1: "Her kalp, yerli lösemi ilacına bir adım daha.",
+  lead: "Duvarda 1.000.000 kalp var ve her biri {price}. Bir kalp aldığınızda duvardaki yeri kırmızıya döner. Toplanan bağışlar, Marmara Üniversitesi ile birlikte yürütülen yerli lösemi ilacı geliştirme çalışmalarında kullanılır.",
+  price_lbl: "1 kalp",
+  cta_buy: "Kalp al",
+  cta_wall: "Duvarı gez",
+  partner: "Marmara Üniversitesi işbirliğiyle",
+  st_red: "Kırmızıya dönen kalp",
+  st_raised: "Toplanan bağış",
+  st_goal: "Hedef",
+  st_left: "Kalan kalp",
+  st_pct: "Hedefin {p} kadarı tamamlandı",
+  wall_h: "Kalp duvarı",
+  wall_p: "Duvar 1.000 bloğa bölünmüş, her blokta 1.000 kalp var. Haritadan bir blok seçin, boş bir kalbe dokunun ve onu kırmızıya çevirin.",
+  map_lbl: "Blok haritası",
+  map_hint: "Açmak için bir bloğa dokunun. Renk ne kadar koyuysa blok o kadar dolu.",
+  blk: "Blok {b}",
+  blk_range: "Kalp {a} – {b}",
+  blk_fill: "{n} / {m} dolu",
+  prev: "Önceki blok",
+  next: "Sonraki blok",
+  find_lbl: "Kalp numarası ara",
+  find_ph: "örn. 482117",
+  find_go: "Bul",
+  find_err: "1 ile 1.000.000 arasında bir numara girin.",
+  jump: "İlk boş kalbe git",
+  lg_empty: "Boş",
+  lg_taken: "Alındı",
+  lg_mine: "Sizin",
+  tip_free: "Kalp {id} · boş, almak için dokunun",
+  tip_taken: "Kalp {id} · {name}",
+  anon: "Anonim bağışçı",
+  how_h: "Nasıl çalışır",
+  s1_t: "Kalbinizi seçin",
+  s1_p: "Duvarda istediğiniz boş kalbe dokunun ya da “Kalp al” ile sıradaki boş kalbi alın.",
+  s2_t: "Bağışınızı yapın",
+  s2_p: "Her kalp 100 ₺. Yurt dışından USD, EUR veya GBP ile bağış yapabilirsiniz.",
+  s3_t: "Kalbiniz kırmızıya döner",
+  s3_p: "Ödeme onaylanınca kalbiniz duvarda kırmızı olur. İsterseniz adınız da kalbin üzerinde görünür.",
+  fund_h: "Bağışlar nereye gidiyor",
+  fund_p: "Bağışlar, Marmara Üniversitesi ile birlikte yürütülen yerli lösemi ilacı geliştirme çalışmasını destekler. Bir ilaç hastaya ulaşmadan önce şu aşamalardan geçer:",
+  f1_t: "Laboratuvar araştırması",
+  f1_p: "Aday moleküller lösemi hücreleri üzerinde test edilir.",
+  f2_t: "Preklinik çalışmalar",
+  f2_p: "Güvenlik ve etkinlik, klinik öncesi modellerde değerlendirilir.",
+  f3_t: "Klinik araştırmalar",
+  f3_p: "Etik kurul ve TİTCK onayıyla gönüllü hastalarda araştırma yapılır.",
+  rate_note: "Döviz fiyatları 2 Ekim 2026 kuruyla yaklaşık 100 ₺ karşılığıdır.",
+  m_title: "Kalp al",
+  m_sel: "Seçilen kalpler",
+  m_more: "+{n} kalp daha",
+  m_qty: "Kaç kalp?",
+  m_cur: "Para birimi",
+  m_name: "Duvarda görünecek ad (isteğe bağlı)",
+  m_name_ph: "örn. Ayşe K.",
+  m_anon: "Adım görünmesin",
+  m_total: "Toplam",
+  m_pay: "{amount} bağışla",
+  m_demo: "Önizleme sürümü: ödeme altyapısı henüz bağlı değil, gerçek ödeme alınmaz.",
+  m_cancel: "Vazgeç",
+  m_close: "Kapat",
+  m_busy: "İşleniyor…",
+  m_err: "Ödeme tamamlanamadı. Lütfen tekrar deneyin.",
+  per: "kalp başına",
+  toast1: "Teşekkürler! Kalbiniz artık kırmızı.",
+  toastN: "Teşekkürler! {n} kalbiniz artık kırmızı.",
+  sold: "Tüm kalpler doldu. Teşekkürler!",
+  lang_lbl: "Dil"
+},
+en: {
+  strip: "Preview version: no real payment is taken until payments are connected.",
+  brand: "One Million Hearts",
+  eyebrow: "A leukemia drug developed in Türkiye",
+  h1: "Every heart brings a homegrown leukemia drug one step closer.",
+  lead: "The wall holds 1,000,000 hearts, each {price}. When you buy a heart, its place on the wall turns red. Donations fund leukemia drug development carried out together with Marmara University in Istanbul.",
+  price_lbl: "1 heart",
+  cta_buy: "Buy a heart",
+  cta_wall: "Explore the wall",
+  partner: "In collaboration with Marmara University",
+  st_red: "Hearts turned red",
+  st_raised: "Raised",
+  st_goal: "Goal",
+  st_left: "Hearts left",
+  st_pct: "{p} of the goal reached",
+  wall_h: "The heart wall",
+  wall_p: "The wall is split into 1,000 blocks of 1,000 hearts. Pick a block on the map, then tap an empty heart to turn it red.",
+  map_lbl: "Block map",
+  map_hint: "Tap a block to open it. The darker the block, the fuller it is.",
+  blk: "Block {b}",
+  blk_range: "Hearts {a} – {b}",
+  blk_fill: "{n} / {m} filled",
+  prev: "Previous block",
+  next: "Next block",
+  find_lbl: "Find a heart number",
+  find_ph: "e.g. 482117",
+  find_go: "Find",
+  find_err: "Enter a number between 1 and 1,000,000.",
+  jump: "Go to the first empty heart",
+  lg_empty: "Empty",
+  lg_taken: "Taken",
+  lg_mine: "Yours",
+  tip_free: "Heart {id} · empty, tap to buy",
+  tip_taken: "Heart {id} · {name}",
+  anon: "Anonymous donor",
+  how_h: "How it works",
+  s1_t: "Choose your heart",
+  s1_p: "Tap any empty heart on the wall, or use “Buy a heart” to take the next free one.",
+  s2_t: "Make your donation",
+  s2_p: "Each heart is 100 TL. From abroad you can donate in USD, EUR or GBP.",
+  s3_t: "Your heart turns red",
+  s3_p: "Once the payment is confirmed, your heart turns red on the wall. You can show your name on it if you like.",
+  fund_h: "Where the money goes",
+  fund_p: "Donations support the development of a leukemia drug in Türkiye, carried out together with Marmara University. Before a drug reaches patients, it goes through these stages:",
+  f1_t: "Laboratory research",
+  f1_p: "Candidate molecules are tested on leukemia cells.",
+  f2_t: "Preclinical studies",
+  f2_p: "Safety and efficacy are assessed in preclinical models.",
+  f3_t: "Clinical trials",
+  f3_p: "With approval from an ethics committee and TİTCK, the Turkish medicines agency, the drug is studied in volunteer patients.",
+  rate_note: "Foreign-currency prices equal roughly 100 TL at the exchange rate of 2 October 2026.",
+  m_title: "Buy hearts",
+  m_sel: "Selected hearts",
+  m_more: "+{n} more",
+  m_qty: "How many hearts?",
+  m_cur: "Currency",
+  m_name: "Name shown on the wall (optional)",
+  m_name_ph: "e.g. Sarah M.",
+  m_anon: "Don't show my name",
+  m_total: "Total",
+  m_pay: "Donate {amount}",
+  m_demo: "Preview version: payments are not connected yet, so no money is charged.",
+  m_cancel: "Cancel",
+  m_close: "Close",
+  m_busy: "Processing…",
+  m_err: "The payment didn't go through. Please try again.",
+  per: "per heart",
+  toast1: "Thank you! Your heart is red now.",
+  toastN: "Thank you! Your {n} hearts are red now.",
+  sold: "Every heart is taken. Thank you!",
+  lang_lbl: "Language"
+},
+de: {
+  strip: "Vorschauversion: Bis die Zahlung angebunden ist, wird nichts abgebucht.",
+  brand: "Eine Million Herzen",
+  eyebrow: "Ein Leukämie-Medikament aus der Türkei",
+  h1: "Jedes Herz bringt ein Leukämie-Medikament aus der Türkei einen Schritt näher.",
+  lead: "Die Wand hat 1.000.000 Herzen, jedes kostet {price}. Wenn Sie ein Herz kaufen, wird sein Platz auf der Wand rot. Die Spenden finanzieren die Entwicklung eines Leukämie-Medikaments gemeinsam mit der Marmara-Universität in Istanbul.",
+  price_lbl: "1 Herz",
+  cta_buy: "Herz kaufen",
+  cta_wall: "Zur Herzwand",
+  partner: "In Zusammenarbeit mit der Marmara-Universität",
+  st_red: "Rote Herzen",
+  st_raised: "Gesammelt",
+  st_goal: "Ziel",
+  st_left: "Freie Herzen",
+  st_pct: "{p} des Ziels erreicht",
+  wall_h: "Die Herzwand",
+  wall_p: "Die Wand ist in 1.000 Blöcke mit je 1.000 Herzen aufgeteilt. Wählen Sie auf der Karte einen Block und tippen Sie auf ein freies Herz, um es rot zu färben.",
+  map_lbl: "Blockkarte",
+  map_hint: "Tippen Sie auf einen Block, um ihn zu öffnen. Je dunkler der Block, desto voller ist er.",
+  blk: "Block {b}",
+  blk_range: "Herzen {a} – {b}",
+  blk_fill: "{n} / {m} gefüllt",
+  prev: "Vorheriger Block",
+  next: "Nächster Block",
+  find_lbl: "Herznummer suchen",
+  find_ph: "z. B. 482117",
+  find_go: "Suchen",
+  find_err: "Geben Sie eine Zahl zwischen 1 und 1.000.000 ein.",
+  jump: "Zum ersten freien Herz",
+  lg_empty: "Frei",
+  lg_taken: "Vergeben",
+  lg_mine: "Ihres",
+  tip_free: "Herz {id} · frei, zum Kaufen tippen",
+  tip_taken: "Herz {id} · {name}",
+  anon: "Anonyme Spende",
+  how_h: "So funktioniert es",
+  s1_t: "Herz auswählen",
+  s1_p: "Tippen Sie auf ein freies Herz auf der Wand oder nehmen Sie mit „Herz kaufen“ das nächste freie.",
+  s2_t: "Spenden",
+  s2_p: "Jedes Herz kostet 100 TL. Aus dem Ausland können Sie in USD, EUR oder GBP spenden.",
+  s3_t: "Ihr Herz wird rot",
+  s3_p: "Sobald die Zahlung bestätigt ist, wird Ihr Herz auf der Wand rot. Auf Wunsch erscheint Ihr Name daran.",
+  fund_h: "Wofür das Geld verwendet wird",
+  fund_p: "Die Spenden unterstützen die Entwicklung eines Leukämie-Medikaments in der Türkei, gemeinsam mit der Marmara-Universität. Bevor ein Medikament Patienten erreicht, durchläuft es diese Phasen:",
+  f1_t: "Laborforschung",
+  f1_p: "Kandidatenmoleküle werden an Leukämiezellen getestet.",
+  f2_t: "Präklinische Studien",
+  f2_p: "Sicherheit und Wirksamkeit werden in präklinischen Modellen geprüft.",
+  f3_t: "Klinische Studien",
+  f3_p: "Mit Zustimmung einer Ethikkommission und der türkischen Arzneimittelbehörde TİTCK wird das Medikament an freiwilligen Patienten untersucht.",
+  rate_note: "Preise in Fremdwährung entsprechen etwa 100 TL zum Kurs vom 2. Oktober 2026.",
+  m_title: "Herzen kaufen",
+  m_sel: "Ausgewählte Herzen",
+  m_more: "+{n} weitere",
+  m_qty: "Wie viele Herzen?",
+  m_cur: "Währung",
+  m_name: "Name auf der Wand (optional)",
+  m_name_ph: "z. B. Anna S.",
+  m_anon: "Meinen Namen nicht zeigen",
+  m_total: "Gesamt",
+  m_pay: "{amount} spenden",
+  m_demo: "Vorschauversion: Die Zahlung ist noch nicht angebunden, es wird nichts abgebucht.",
+  m_cancel: "Abbrechen",
+  m_close: "Schließen",
+  m_busy: "Wird verarbeitet…",
+  m_err: "Die Zahlung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  per: "pro Herz",
+  toast1: "Danke! Ihr Herz ist jetzt rot.",
+  toastN: "Danke! Ihre {n} Herzen sind jetzt rot.",
+  sold: "Alle Herzen sind vergeben. Danke!",
+  lang_lbl: "Sprache"
+},
+fr: {
+  strip: "Version d'aperçu : aucun paiement réel n'est prélevé tant que le paiement n'est pas connecté.",
+  brand: "Un million de cœurs",
+  eyebrow: "Un médicament contre la leucémie développé en Turquie",
+  h1: "Chaque cœur fait avancer un médicament contre la leucémie développé en Turquie.",
+  lead: "Le mur compte 1 000 000 de cœurs, à {price} chacun. Quand vous achetez un cœur, sa place sur le mur devient rouge. Les dons financent le développement d'un médicament contre la leucémie, mené avec l'Université de Marmara à Istanbul.",
+  price_lbl: "1 cœur",
+  cta_buy: "Acheter un cœur",
+  cta_wall: "Voir le mur",
+  partner: "En collaboration avec l'Université de Marmara",
+  st_red: "Cœurs devenus rouges",
+  st_raised: "Collecté",
+  st_goal: "Objectif",
+  st_left: "Cœurs restants",
+  st_pct: "{p} de l'objectif atteint",
+  wall_h: "Le mur des cœurs",
+  wall_p: "Le mur est divisé en 1 000 blocs de 1 000 cœurs. Choisissez un bloc sur la carte, puis touchez un cœur vide pour le rendre rouge.",
+  map_lbl: "Carte des blocs",
+  map_hint: "Touchez un bloc pour l'ouvrir. Plus le bloc est foncé, plus il est rempli.",
+  blk: "Bloc {b}",
+  blk_range: "Cœurs {a} – {b}",
+  blk_fill: "{n} / {m} remplis",
+  prev: "Bloc précédent",
+  next: "Bloc suivant",
+  find_lbl: "Chercher un numéro de cœur",
+  find_ph: "ex. 482117",
+  find_go: "Chercher",
+  find_err: "Saisissez un numéro entre 1 et 1 000 000.",
+  jump: "Aller au premier cœur libre",
+  lg_empty: "Libre",
+  lg_taken: "Pris",
+  lg_mine: "Le vôtre",
+  tip_free: "Cœur {id} · libre, touchez pour l'acheter",
+  tip_taken: "Cœur {id} · {name}",
+  anon: "Donateur anonyme",
+  how_h: "Comment ça marche",
+  s1_t: "Choisissez votre cœur",
+  s1_p: "Touchez un cœur vide sur le mur, ou utilisez « Acheter un cœur » pour prendre le prochain libre.",
+  s2_t: "Faites votre don",
+  s2_p: "Chaque cœur coûte 100 TL. Depuis l'étranger, vous pouvez donner en USD, EUR ou GBP.",
+  s3_t: "Votre cœur devient rouge",
+  s3_p: "Une fois le paiement confirmé, votre cœur devient rouge sur le mur. Votre nom peut y apparaître si vous le souhaitez.",
+  fund_h: "À quoi servent les dons",
+  fund_p: "Les dons soutiennent le développement d'un médicament contre la leucémie en Turquie, mené avec l'Université de Marmara. Avant d'arriver aux patients, un médicament passe par ces étapes :",
+  f1_t: "Recherche en laboratoire",
+  f1_p: "Les molécules candidates sont testées sur des cellules leucémiques.",
+  f2_t: "Études précliniques",
+  f2_p: "La sécurité et l'efficacité sont évaluées sur des modèles précliniques.",
+  f3_t: "Essais cliniques",
+  f3_p: "Avec l'accord d'un comité d'éthique et de la TİTCK, l'agence turque du médicament, le médicament est étudié chez des patients volontaires.",
+  rate_note: "Les prix en devises correspondent à environ 100 TL au taux du 2 octobre 2026.",
+  m_title: "Acheter des cœurs",
+  m_sel: "Cœurs sélectionnés",
+  m_more: "+{n} de plus",
+  m_qty: "Combien de cœurs ?",
+  m_cur: "Devise",
+  m_name: "Nom affiché sur le mur (facultatif)",
+  m_name_ph: "ex. Claire D.",
+  m_anon: "Ne pas afficher mon nom",
+  m_total: "Total",
+  m_pay: "Donner {amount}",
+  m_demo: "Version d'aperçu : le paiement n'est pas encore connecté, aucun montant n'est débité.",
+  m_cancel: "Annuler",
+  m_close: "Fermer",
+  m_busy: "Traitement…",
+  m_err: "Le paiement n'a pas abouti. Veuillez réessayer.",
+  per: "par cœur",
+  toast1: "Merci ! Votre cœur est maintenant rouge.",
+  toastN: "Merci ! Vos {n} cœurs sont maintenant rouges.",
+  sold: "Tous les cœurs sont pris. Merci !",
+  lang_lbl: "Langue"
+},
+ar: {
+  strip: "نسخة تجريبية: لن يتم خصم أي مبلغ حتى يتم تفعيل نظام الدفع.",
+  brand: "مليون قلب",
+  eyebrow: "دواء لسرطان الدم يُطوَّر في تركيا",
+  h1: "كل قلب يقرّبنا خطوة من دواء لسرطان الدم يُطوَّر في تركيا.",
+  lead: "يضم الجدار 1,000,000 قلب، سعر كل قلب {price}. عندما تشتري قلبًا يتحول مكانه على الجدار إلى اللون الأحمر. تُخصَّص التبرعات لتطوير دواء لسرطان الدم بالتعاون مع جامعة مرمرة في إسطنبول.",
+  price_lbl: "قلب واحد",
+  cta_buy: "اشترِ قلبًا",
+  cta_wall: "تصفّح الجدار",
+  partner: "بالتعاون مع جامعة مرمرة",
+  st_red: "القلوب الحمراء",
+  st_raised: "المبلغ المُجمَّع",
+  st_goal: "الهدف",
+  st_left: "القلوب المتبقية",
+  st_pct: "تحقق {p} من الهدف",
+  wall_h: "جدار القلوب",
+  wall_p: "ينقسم الجدار إلى 1000 مجموعة، في كل منها 1000 قلب. اختر مجموعة من الخريطة، ثم المس قلبًا فارغًا ليتحول إلى الأحمر.",
+  map_lbl: "خريطة المجموعات",
+  map_hint: "المس مجموعة لفتحها. كلما كان لون المجموعة أغمق كانت أكثر امتلاءً.",
+  blk: "المجموعة {b}",
+  blk_range: "القلوب {a} – {b}",
+  blk_fill: "{n} / {m} ممتلئ",
+  prev: "المجموعة السابقة",
+  next: "المجموعة التالية",
+  find_lbl: "ابحث برقم القلب",
+  find_ph: "مثال: 482117",
+  find_go: "ابحث",
+  find_err: "أدخل رقمًا بين 1 و1,000,000.",
+  jump: "انتقل إلى أول قلب فارغ",
+  lg_empty: "فارغ",
+  lg_taken: "محجوز",
+  lg_mine: "قلبك",
+  tip_free: "القلب {id} · فارغ، المس للشراء",
+  tip_taken: "القلب {id} · {name}",
+  anon: "متبرع مجهول",
+  how_h: "كيف يعمل",
+  s1_t: "اختر قلبك",
+  s1_p: "المس أي قلب فارغ على الجدار، أو استخدم «اشترِ قلبًا» لأخذ القلب الفارغ التالي.",
+  s2_t: "قدّم تبرعك",
+  s2_p: "سعر كل قلب 100 ليرة تركية. يمكنك التبرع من الخارج بالدولار أو اليورو أو الجنيه الإسترليني.",
+  s3_t: "يتحول قلبك إلى الأحمر",
+  s3_p: "بعد تأكيد الدفع يصبح قلبك أحمر على الجدار، ويمكن أن يظهر اسمك عليه إن رغبت.",
+  fund_h: "أين تذهب التبرعات",
+  fund_p: "تدعم التبرعات تطوير دواء لسرطان الدم في تركيا بالتعاون مع جامعة مرمرة. قبل أن يصل الدواء إلى المرضى يمر بهذه المراحل:",
+  f1_t: "البحث المخبري",
+  f1_p: "تُختبر الجزيئات المرشحة على خلايا سرطان الدم.",
+  f2_t: "الدراسات ما قبل السريرية",
+  f2_p: "تُقيَّم السلامة والفعالية في نماذج ما قبل سريرية.",
+  f3_t: "التجارب السريرية",
+  f3_p: "بموافقة لجنة الأخلاقيات وهيئة الأدوية والأجهزة الطبية التركية (TİTCK) يُدرس الدواء على مرضى متطوعين.",
+  rate_note: "الأسعار بالعملات الأجنبية تعادل نحو 100 ليرة تركية بسعر صرف 2 أكتوبر 2026.",
+  m_title: "شراء القلوب",
+  m_sel: "القلوب المختارة",
+  m_more: "+{n} أخرى",
+  m_qty: "كم قلبًا؟",
+  m_cur: "العملة",
+  m_name: "الاسم الظاهر على الجدار (اختياري)",
+  m_name_ph: "مثال: أحمد م.",
+  m_anon: "لا تُظهر اسمي",
+  m_total: "المجموع",
+  m_pay: "تبرّع بمبلغ {amount}",
+  m_demo: "نسخة تجريبية: نظام الدفع غير مفعّل بعد، ولن يتم خصم أي مبلغ.",
+  m_cancel: "إلغاء",
+  m_close: "إغلاق",
+  m_busy: "جارٍ المعالجة…",
+  m_err: "لم تكتمل عملية الدفع. يُرجى المحاولة مرة أخرى.",
+  per: "لكل قلب",
+  toast1: "شكرًا لك! أصبح قلبك أحمر الآن.",
+  toastN: "شكرًا لك! أصبحت قلوبك ({n}) حمراء الآن.",
+  sold: "تم حجز جميع القلوب. شكرًا لكم!",
+  lang_lbl: "اللغة"
+}
+};
+
+/* ───────── Veri katmanı ─────────
+   Bu önizlemede veriler yalnızca açık sayfada tutulur.
+   Gerçek sitede:
+   - load(): sayfa açılışında dolu kalpleri sunucudan çeker (ör. GET /api/hearts).
+   - purchase(): ödeme sağlayıcısına (iyzico, PayTR, Stripe vb.) yönlendirir; kalpler ancak
+     sunucu ödeme onayını aldıktan sonra kırmızıya döner ve tüm ziyaretçilerde görünür. */
+const HeartStore = {
+  async load() { return []; },                // [{ id, name }]
+  async purchase({ ids }) {
+    await new Promise(r => setTimeout(r, 900));
+    return { ok: true, ids };
+  }
+};
+
+/* ───────── Durum ───────── */
+const status = new Uint8Array(TOTAL + 1);   // 0 boş · 1 alınmış · 2 bu ziyaretçinin
+const donors = new Map();                    // kalp no → görünen ad
+const blockCount = new Uint16Array(BLOCKS);
+let filledTotal = 0;
+let nextFree = 1;
+const S = { lang: 'tr', cur: 'TRY', curManual: false, block: 0, hover: 0, mapHover: -1, pulse: new Map() };
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const $ = id => document.getElementById(id);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+/* ───────── Biçimlendirme ───────── */
+let F = {};
+function makeFormatters() {
+  const loc = LOCALES[S.lang];
+  F.n = new Intl.NumberFormat(loc);
+  F.pct = new Intl.NumberFormat(loc, { style: 'percent', maximumFractionDigits: 4 });
+  F.compact = new Intl.NumberFormat(loc, { notation: 'compact', maximumFractionDigits: 1 });
+}
+function t(key, vars) {
+  let s = (T[S.lang] && T[S.lang][key]) ?? T.en[key] ?? key;
+  if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+  return s;
+}
+function money(v, cur = S.cur) {
+  const whole = Math.abs(v - Math.round(v)) < 1e-6;
+  return new Intl.NumberFormat(LOCALES[S.lang], {
+    style: 'currency', currency: cur,
+    minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2
+  }).format(whole ? Math.round(v) : v);
+}
+const heartNo = id => '#' + F.n.format(id);
+
+/* ───────── Kalp şekli ve renkler ───────── */
+const HEART = new Path2D('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+let C = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = n => cs.getPropertyValue(n).trim();
+  C = { empty: g('--heart-empty'), red: g('--red'), ink: g('--ink'), surface: g('--surface') };
+}
+
+/* ───────── Duvar (1 blok = 1.000 kalp) ───────── */
+const wallBox = $('wallBox'), wallCv = $('wallCv'), wallCtx = wallCv.getContext('2d');
+const W = { cols: 40, rows: 25, cell: 0, w: 0, h: 0, dpr: 1 };
+
+function layoutWall() {
+  const w = wallBox.clientWidth;
+  if (!w) return;
+  W.cols = w < 560 ? 25 : 40;
+  W.rows = PER_BLOCK / W.cols;
+  W.w = w;
+  W.cell = w / W.cols;
+  W.h = Math.round(W.cell * W.rows);
+  W.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  wallCv.style.height = W.h + 'px';
+  wallCv.width = Math.round(w * W.dpr);
+  wallCv.height = Math.round(W.h * W.dpr);
+  drawWall();
+}
+
+function drawWall() {
+  if (!W.cell) return;
+  const ctx = wallCtx, dpr = W.dpr, cell = W.cell;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, wallCv.width, wallCv.height);
+  const start = S.block * PER_BLOCK + 1;
+  const base = cell * 0.8;
+  const now = performance.now();
+  for (let i = 0; i < PER_BLOCK; i++) {
+    const id = start + i;
+    const st = status[id];
+    const cx = (i % W.cols) * cell + cell / 2;
+    const cy = ((i / W.cols) | 0) * cell + cell / 2;
+    let s = base;
+    const p = S.pulse.get(id);
+    if (p !== undefined) {
+      const e = (now - p) / 700;
+      if (e < 1) s = base * (1 + 0.45 * Math.sin(Math.PI * e));
+    }
+    const k = (s / 20) * dpr;
+    ctx.setTransform(k, 0, 0, k, cx * dpr - 12 * k, cy * dpr - 12.2 * k);
+    ctx.fillStyle = st ? C.red : C.empty;
+    ctx.fill(HEART);
+    if (st === 2) {
+      ctx.lineWidth = 2.4; ctx.strokeStyle = C.ink; ctx.stroke(HEART);
+    } else if (id === S.hover) {
+      ctx.lineWidth = 2.2; ctx.strokeStyle = st ? C.ink : C.red; ctx.stroke(HEART);
+    }
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function animatePulse() {
+  const now = performance.now();
+  for (const [id, t0] of S.pulse) if (now - t0 > 700) S.pulse.delete(id);
+  drawWall();
+  if (S.pulse.size) requestAnimationFrame(animatePulse);
+}
+
+function idAt(ev) {
+  const r = wallCv.getBoundingClientRect();
+  const col = Math.floor((ev.clientX - r.left) / W.cell);
+  const row = Math.floor((ev.clientY - r.top) / W.cell);
+  if (col < 0 || col >= W.cols || row < 0 || row >= W.rows) return 0;
+  return S.block * PER_BLOCK + row * W.cols + col + 1;
+}
+
+const tip = $('tip');
+let tipTimer = 0;
+function showTip(id, pin) {
+  if (!id) { hideTip(); return; }
+  const st = status[id];
+  tip.dir = document.documentElement.dir;
+  tip.textContent = st
+    ? t('tip_taken', { id: heartNo(id), name: donors.get(id) || t('anon') })
+    : t('tip_free', { id: heartNo(id) });
+  tip.hidden = false;
+  const i = id - (S.block * PER_BLOCK + 1);
+  const cx = (i % W.cols) * W.cell + W.cell / 2;
+  const top = ((i / W.cols) | 0) * W.cell;
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  tip.style.left = Math.max(0, Math.min(W.w - tw, cx - tw / 2)) + 'px';
+  let y = top - th - 6;
+  if (y < 0) y = top + W.cell + 6;
+  tip.style.top = y + 'px';
+  clearTimeout(tipTimer);
+  if (pin) tipTimer = setTimeout(() => { hideTip(); if (S.hover === id) { S.hover = 0; drawWall(); } }, 2800);
+}
+function hideTip() { tip.hidden = true; }
+
+wallCv.addEventListener('pointermove', ev => {
+  if (ev.pointerType === 'touch') return;
+  const id = idAt(ev);
+  wallCv.style.cursor = id ? 'pointer' : 'default';
+  if (id !== S.hover) { S.hover = id; drawWall(); showTip(id); }
+});
+wallCv.addEventListener('pointerleave', () => { S.hover = 0; drawWall(); hideTip(); });
+wallCv.addEventListener('click', ev => {
+  const id = idAt(ev);
+  if (!id) return;
+  if (status[id]) { S.hover = id; drawWall(); showTip(id, true); }
+  else { hideTip(); openBuy(id); }
+});
+
+/* ───────── Blok haritası (1.000 blok) ───────── */
+const mapBox = $('mapBox'), mapCv = $('mapCv'), mapCtx = mapCv.getContext('2d');
+const M = { cols: 40, rows: 25, cell: 0, dpr: 1 };
+
+function layoutMap() {
+  const w = mapBox.clientWidth;
+  if (!w) return;
+  M.cell = w / M.cols;
+  M.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const h = Math.round(M.cell * M.rows);
+  mapCv.style.height = h + 'px';
+  mapCv.width = Math.round(w * M.dpr);
+  mapCv.height = Math.round(h * M.dpr);
+  drawMap();
+}
+
+function drawMap() {
+  if (!M.cell) return;
+  const ctx = mapCtx, c = M.cell, g = c > 6 ? 1 : 0.6;
+  ctx.setTransform(M.dpr, 0, 0, M.dpr, 0, 0);
+  ctx.clearRect(0, 0, mapCv.width, mapCv.height);
+  for (let b = 0; b < BLOCKS; b++) {
+    const x = (b % M.cols) * c, y = ((b / M.cols) | 0) * c;
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = C.empty;
+    ctx.fillRect(x + g / 2, y + g / 2, c - g, c - g);
+    const n = blockCount[b];
+    if (n) {
+      ctx.globalAlpha = 0.3 + 0.7 * (n / PER_BLOCK);
+      ctx.fillStyle = C.red;
+      ctx.fillRect(x + g / 2, y + g / 2, c - g, c - g);
+    }
+  }
+  ctx.globalAlpha = 1;
+  const outline = (b, color, lw) => {
+    const x = (b % M.cols) * c, y = ((b / M.cols) | 0) * c;
+    ctx.strokeStyle = color; ctx.lineWidth = lw;
+    ctx.strokeRect(x + lw / 2, y + lw / 2, c - lw, c - lw);
+  };
+  if (S.mapHover >= 0 && S.mapHover !== S.block) outline(S.mapHover, C.red, 1.5);
+  outline(S.block, C.ink, 2);
+}
+
+function blockAt(ev) {
+  const r = mapCv.getBoundingClientRect();
+  const col = Math.floor((ev.clientX - r.left) / M.cell);
+  const row = Math.floor((ev.clientY - r.top) / M.cell);
+  if (col < 0 || col >= M.cols || row < 0 || row >= M.rows) return -1;
+  return row * M.cols + col;
+}
+mapCv.addEventListener('pointermove', ev => {
+  if (ev.pointerType === 'touch') return;
+  const b = blockAt(ev);
+  if (b !== S.mapHover) { S.mapHover = b; drawMap(); renderMapCap(); }
+});
+mapCv.addEventListener('pointerleave', () => { S.mapHover = -1; drawMap(); renderMapCap(); });
+mapCv.addEventListener('click', ev => {
+  const b = blockAt(ev);
+  if (b < 0) return;
+  selectBlock(b);
+  if (window.matchMedia('(max-width: 880px)').matches) $('blockPanel').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+});
+
+function selectBlock(b) {
+  S.block = Math.max(0, Math.min(BLOCKS - 1, b));
+  S.hover = 0;
+  hideTip();
+  renderBlockHead();
+  renderMapCap();
+  drawWall();
+  drawMap();
+}
+$('prevBtn').addEventListener('click', () => selectBlock(S.block - 1));
+$('nextBtn').addEventListener('click', () => selectBlock(S.block + 1));
+
+function focusHeart(id) {
+  selectBlock(Math.floor((id - 1) / PER_BLOCK));
+  S.hover = id;
+  drawWall();
+  $('blockPanel').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+  showTip(id, true);
+}
+
+$('findForm').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const raw = $('findIn').value.replace(/[^\d]/g, '');
+  const id = parseInt(raw, 10);
+  const err = $('findErr');
+  if (!raw || !(id >= 1 && id <= TOTAL)) { err.textContent = t('find_err'); err.hidden = false; return; }
+  err.hidden = true;
+  focusHeart(id);
+});
+$('jumpBtn').addEventListener('click', () => { if (nextFree <= TOTAL) focusHeart(nextFree); });
+
+/* ───────── Kalp seçimi ve satın alma ───────── */
+function pickFree(start, qty) {
+  const out = [];
+  let id = start, scanned = 0;
+  while (out.length < qty && scanned < TOTAL) {
+    if (!status[id]) out.push(id);
+    id = id === TOTAL ? 1 : id + 1;
+    scanned++;
+  }
+  return out;
+}
+
+function applyFilled(list, mine) {
+  for (const { id, name } of list) {
+    if (status[id]) continue;
+    status[id] = mine ? 2 : 1;
+    if (name) donors.set(id, name);
+    blockCount[(id - 1) / PER_BLOCK | 0]++;
+    filledTotal++;
+  }
+  while (nextFree <= TOTAL && status[nextFree]) nextFree++;
+  renderStats(); renderBlockHead(); renderMapCap(); drawMap(); drawWall();
+}
+
+const dlg = $('dlg'), qty = $('qty'), payBtn = $('payBtn');
+const B = { start: 0, ids: [], busy: false };
+const QTY_PRESETS = [1, 5, 10, 50];
+
+function maxQty() { return Math.max(1, Math.min(1000, TOTAL - filledTotal)); }
+function currentQty() {
+  let q = parseInt(qty.value, 10);
+  if (!Number.isFinite(q)) q = 1;
+  return Math.max(1, Math.min(q, maxQty()));
+}
+
+function openBuy(startId) {
+  if (filledTotal >= TOTAL) { toast(t('sold')); return; }
+  B.start = startId && !status[startId] ? startId : 0;
+  B.busy = false;
+  qty.value = 1;
+  qty.max = maxQty();
+  $('donor').value = '';
+  $('donor').disabled = false;
+  $('anonChk').checked = false;
+  $('dlgErr').hidden = true;
+  payBtn.disabled = false;
+  renderDialog();
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+}
+function closeBuy() {
+  if (B.busy) return;
+  if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open');
+}
+
+function renderDialog() {
+  const q = currentQty();
+  B.ids = pickFree(B.start || nextFree, q);
+  const list = $('selList');
+  list.textContent = '';
+  B.ids.slice(0, 6).forEach(id => {
+    const s = document.createElement('span');
+    s.textContent = heartNo(id);
+    list.appendChild(s);
+  });
+  if (B.ids.length > 6) {
+    const m = document.createElement('em');
+    m.textContent = t('m_more', { n: F.n.format(B.ids.length - 6) });
+    list.appendChild(m);
+  }
+  const amount = B.ids.length * PRICES[S.cur];
+  $('totalAmt').textContent = money(amount);
+  $('perAmt').textContent = money(PRICES[S.cur]) + ' ' + t('per');
+  if (!B.busy) payBtn.textContent = t('m_pay', { amount: money(amount) });
+  $$('#chips .chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.q === q)));
+  $('curSel2').value = S.cur;
+}
+
+QTY_PRESETS.forEach(n => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.dataset.q = n; b.textContent = n;
+  b.addEventListener('click', () => { qty.value = Math.min(n, maxQty()); renderDialog(); });
+  $('chips').appendChild(b);
+});
+$$('[data-step]').forEach(b => b.addEventListener('click', () => {
+  qty.value = Math.max(1, Math.min(maxQty(), currentQty() + Number(b.dataset.step)));
+  renderDialog();
+}));
+qty.addEventListener('input', renderDialog);
+qty.addEventListener('change', () => { qty.value = currentQty(); renderDialog(); });
+$('anonChk').addEventListener('change', e => { $('donor').disabled = e.target.checked; });
+$('dlgX').addEventListener('click', closeBuy);
+$('dlgCancel').addEventListener('click', closeBuy);
+dlg.addEventListener('cancel', e => { if (B.busy) e.preventDefault(); });
+dlg.addEventListener('click', e => { if (e.target === dlg) closeBuy(); });
+
+$('buyForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  if (B.busy) return;
+  const ids = B.ids.filter(id => !status[id]);
+  if (!ids.length) { renderDialog(); return; }
+  const name = $('anonChk').checked ? '' : $('donor').value.trim().slice(0, 40);
+  B.busy = true;
+  payBtn.disabled = true;
+  payBtn.textContent = t('m_busy');
+  $('dlgErr').hidden = true;
+  try {
+    const res = await HeartStore.purchase({ ids, currency: S.cur, amount: ids.length * PRICES[S.cur], name });
+    if (!res || !res.ok) throw new Error('payment');
+    B.busy = false;
+    closeBuy();
+    applyFilled(res.ids.map(id => ({ id, name })), true);
+    selectBlock(Math.floor((res.ids[0] - 1) / PER_BLOCK));
+    if (!reduced) {
+      const now = performance.now();
+      res.ids.forEach(id => S.pulse.set(id, now));
+      requestAnimationFrame(animatePulse);
+    }
+    $('blockPanel').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+    toast(res.ids.length === 1 ? t('toast1') : t('toastN', { n: F.n.format(res.ids.length) }));
+  } catch (e) {
+    B.busy = false;
+    payBtn.disabled = false;
+    $('dlgErr').textContent = t('m_err');
+    $('dlgErr').hidden = false;
+    renderDialog();
+  }
+});
+
+$('ctaBuy').addEventListener('click', () => openBuy(0));
+
+/* ───────── Bildirim ───────── */
+const toastEl = $('toast');
+let toastTimer = 0;
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.hidden = false;
+  toastEl.classList.remove('show');
+  void toastEl.offsetWidth;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastEl.hidden = true; }, 3800);
+}
+
+/* ───────── Ekran güncelleme ───────── */
+function renderPrices() {
+  $('lead').textContent = t('lead', { price: money(PRICES[S.cur]) });
+  const box = $('priceChips');
+  box.textContent = '';
+  CURRENCIES.forEach(code => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'price';
+    b.textContent = money(PRICES[code], code);
+    b.setAttribute('aria-pressed', String(code === S.cur));
+    b.addEventListener('click', () => setCurrency(code, true));
+    box.appendChild(b);
+  });
+}
+
+function renderStats() {
+  $('bigNum').textContent = F.n.format(filledTotal);
+  $('ofTotal').textContent = '/ ' + F.n.format(TOTAL);
+  const p = filledTotal / TOTAL;
+  $('barFill').style.width = (filledTotal ? Math.max(p * 100, 0.8) : 0) + '%';
+  $('bar').setAttribute('aria-valuenow', filledTotal);
+  $('bar').setAttribute('aria-label', t('st_red'));
+  $('pct').textContent = t('st_pct', { p: F.pct.format(p) });
+  $('raised').textContent = money(filledTotal * PRICES[S.cur]);
+  $('goal').textContent = money(TOTAL * PRICES[S.cur]);
+  $('left').textContent = F.n.format(TOTAL - filledTotal);
+  const ticks = $('ticks');
+  ticks.textContent = '';
+  [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+    const s = document.createElement('span');
+    s.textContent = F.compact.format(f * TOTAL);
+    ticks.appendChild(s);
+  });
+}
+
+function renderBlockHead() {
+  const a = S.block * PER_BLOCK + 1, b = a + PER_BLOCK - 1;
+  $('blkTitle').textContent = t('blk', { b: F.n.format(S.block + 1) });
+  $('blkRange').textContent = t('blk_range', { a: heartNo(a), b: heartNo(b) });
+  const fill = t('blk_fill', { n: F.n.format(blockCount[S.block]), m: F.n.format(PER_BLOCK) });
+  $('blkFill').textContent = fill;
+  wallCv.setAttribute('aria-label', t('blk', { b: F.n.format(S.block + 1) }) + ' · ' + fill);
+  $('prevBtn').disabled = S.block === 0;
+  $('nextBtn').disabled = S.block === BLOCKS - 1;
+}
+
+function renderMapCap() {
+  const b = S.mapHover >= 0 ? S.mapHover : S.block;
+  $('mapCap').textContent = t('blk', { b: F.n.format(b + 1) }) + ' · ' +
+    t('blk_fill', { n: F.n.format(blockCount[b]), m: F.n.format(PER_BLOCK) });
+}
+
+function renderAll() {
+  renderPrices(); renderStats(); renderBlockHead(); renderMapCap();
+  drawWall(); drawMap();
+  if (dlg.open) renderDialog();
+}
+
+function setCurrency(code, manual) {
+  if (!PRICES[code]) return;
+  S.cur = code;
+  if (manual) S.curManual = true;
+  $('curSel').value = code;
+  $('curSel2').value = code;
+  renderPrices(); renderStats();
+  if (dlg.open) renderDialog();
+}
+
+function applyLang(lang) {
+  if (!T[lang]) lang = 'en';
+  S.lang = lang;
+  makeFormatters();
+  if (!S.curManual) S.cur = LANG_CUR[lang];
+  if (lang === 'en' && !S.curManual && /^en-GB/i.test(navigator.language || '')) S.cur = 'GBP';
+  const root = document.documentElement;
+  root.lang = lang;
+  root.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.title = t('brand');
+  $$('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $$('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  $$('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  $('langSel').value = lang;
+  $('curSel').value = S.cur;
+  $('curSel2').value = S.cur;
+  $('findErr').hidden = true;
+  hideTip();
+  renderAll();
+}
+
+/* ───────── Başlangıç ───────── */
+function fillSelect(sel, items) {
+  sel.textContent = '';
+  items.forEach(([v, label]) => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = label;
+    sel.appendChild(o);
+  });
+}
+fillSelect($('langSel'), Object.keys(T).map(k => [k, LANG_NAMES[k]]));
+fillSelect($('curSel'), CURRENCIES.map(c => [c, CUR_LABEL[c]]));
+fillSelect($('curSel2'), CURRENCIES.map(c => [c, CUR_LABEL[c]]));
+$('langSel').addEventListener('change', e => applyLang(e.target.value));
+$('curSel').addEventListener('change', e => setCurrency(e.target.value, true));
+$('curSel2').addEventListener('change', e => setCurrency(e.target.value, true));
+
+function detectLang() {
+  const h = (location.hash || '').slice(1).toLowerCase();
+  if (T[h]) return h;
+  const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || 'tr').slice(0, 2).toLowerCase();
+  return T[nav] ? nav : 'en';
+}
+window.addEventListener('hashchange', () => {
+  const h = (location.hash || '').slice(1).toLowerCase();
+  if (T[h]) applyLang(h);
+});
+
+readColors();
+const themeChanged = () => { readColors(); drawWall(); drawMap(); };
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeChanged);
+new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+applyLang(detectLang());
+layoutWall();
+layoutMap();
+if ('ResizeObserver' in window) {
+  new ResizeObserver(layoutWall).observe(wallBox);
+  new ResizeObserver(layoutMap).observe(mapBox);
+} else {
+  window.addEventListener('resize', () => { layoutWall(); layoutMap(); });
+}
+
+HeartStore.load().then(list => { if (list && list.length) applyFilled(list, false); });
+})();
+</script>
+</body>
+</html>
