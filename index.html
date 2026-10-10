@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bir Milyon Kalp</title>
 <meta name="description" content="1.000.000 kalp, her biri 100 ₺. Marmara Üniversitesi ile birlikte geliştirilecek yerli lösemi ilacı için bağış kampanyası.">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#C8102E">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Milyon Kalp">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -62,6 +70,9 @@ p{margin:0}
 .brand svg{width:26px;height:26px;fill:var(--red);flex:none}
 .controls{display:flex;gap:8px;flex-wrap:wrap}
 select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.4rem .6rem;font-size:.9rem;min-height:40px;cursor:pointer}
+.install{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 .85rem;border-radius:8px;border:1px solid var(--red);background:transparent;color:var(--red-text);font-size:.9rem;font-weight:600;cursor:pointer}
+.install:hover{background:var(--red-soft)}
+.install svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
 /* Açılış */
 .hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(20px,4vw,48px) clamp(40px,6vw,72px)}
@@ -219,6 +230,7 @@ dialog::backdrop{background:rgb(8 10 18 / .55)}
     <span data-i18n="brand"></span>
   </div>
   <div class="controls">
+    <button class="install" id="installBtn" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span data-i18n="install"></span></button>
     <label><span class="sr" data-i18n="lang_lbl"></span><select id="langSel"></select></label>
     <label><span class="sr" data-i18n="m_cur"></span><select id="curSel"></select></label>
   </div>
@@ -485,7 +497,10 @@ tr: {
   toast1: "Teşekkürler! Kalbiniz artık kırmızı.",
   toastN: "Teşekkürler! {n} kalbiniz artık kırmızı.",
   sold: "Tüm kalpler doldu. Teşekkürler!",
-  lang_lbl: "Dil"
+  lang_lbl: "Dil",
+  install: "Uygulamayı yükle",
+  ios_hint: "iPhone'da: Paylaş düğmesine dokunun, ardından “Ana Ekrana Ekle”yi seçin.",
+  installed: "Uygulama yüklendi."
 },
 en: {
   strip: "Preview version: no real payment is taken until payments are connected.",
@@ -557,7 +572,10 @@ en: {
   toast1: "Thank you! Your heart is red now.",
   toastN: "Thank you! Your {n} hearts are red now.",
   sold: "Every heart is taken. Thank you!",
-  lang_lbl: "Language"
+  lang_lbl: "Language",
+  install: "Install app",
+  ios_hint: "On iPhone: tap the Share button, then choose “Add to Home Screen”.",
+  installed: "App installed."
 },
 de: {
   strip: "Vorschauversion: Bis die Zahlung angebunden ist, wird nichts abgebucht.",
@@ -629,7 +647,10 @@ de: {
   toast1: "Danke! Ihr Herz ist jetzt rot.",
   toastN: "Danke! Ihre {n} Herzen sind jetzt rot.",
   sold: "Alle Herzen sind vergeben. Danke!",
-  lang_lbl: "Sprache"
+  lang_lbl: "Sprache",
+  install: "App installieren",
+  ios_hint: "Auf dem iPhone: Tippen Sie auf „Teilen“ und dann auf „Zum Home-Bildschirm“.",
+  installed: "App installiert."
 },
 fr: {
   strip: "Version d'aperçu : aucun paiement réel n'est prélevé tant que le paiement n'est pas connecté.",
@@ -701,7 +722,10 @@ fr: {
   toast1: "Merci ! Votre cœur est maintenant rouge.",
   toastN: "Merci ! Vos {n} cœurs sont maintenant rouges.",
   sold: "Tous les cœurs sont pris. Merci !",
-  lang_lbl: "Langue"
+  lang_lbl: "Langue",
+  install: "Installer l'app",
+  ios_hint: "Sur iPhone : touchez Partager, puis « Sur l'écran d'accueil ».",
+  installed: "Application installée."
 },
 ar: {
   strip: "نسخة تجريبية: لن يتم خصم أي مبلغ حتى يتم تفعيل نظام الدفع.",
@@ -773,7 +797,10 @@ ar: {
   toast1: "شكرًا لك! أصبح قلبك أحمر الآن.",
   toastN: "شكرًا لك! أصبحت قلوبك ({n}) حمراء الآن.",
   sold: "تم حجز جميع القلوب. شكرًا لكم!",
-  lang_lbl: "اللغة"
+  lang_lbl: "اللغة",
+  install: "ثبّت التطبيق",
+  ios_hint: "على iPhone: المس زر المشاركة ثم اختر «إضافة إلى الشاشة الرئيسية».",
+  installed: "تم تثبيت التطبيق."
 }
 };
 
@@ -1307,6 +1334,30 @@ if ('ResizeObserver' in window) {
 }
 
 HeartStore.load().then(list => { if (list && list.length) applyFilled(list, false); });
+
+/* ───────── Mobil uygulama (telefona kurulum) ───────── */
+const installBtn = $('installBtn');
+let installPrompt = null;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+if (isIOS && !isStandalone) installBtn.hidden = false;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+  if (!isStandalone) installBtn.hidden = false;
+});
+installBtn.addEventListener('click', () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    installPrompt.userChoice.finally(() => { installPrompt = null; installBtn.hidden = true; });
+  } else if (isIOS) {
+    toast(t('ios_hint'));
+  }
+});
+window.addEventListener('appinstalled', () => { installBtn.hidden = true; toast(t('installed')); });
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+}
 })();
 </script>
 </body>
